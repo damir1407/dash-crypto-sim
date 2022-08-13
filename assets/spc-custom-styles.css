@@ -63,10 +63,11 @@ body {
 }
 
 .banner button {
-  color: #95969A;
+  color: #4B5460;
   margin-right: 10px;
   height: 3rem;
   line-height: 3rem;
+  border-color: #4B5460;
 }
 
 #banner-logo {
@@ -77,8 +78,8 @@ body {
 }
 
 .banner button:hover {
-  color: #92e0d3;
-  border-color: whitesmoke;
+  background-color: #4B5460;
+  color: white;
 }
 
 .banner Img {
@@ -273,7 +274,7 @@ body {
 }
 
 #stop-button > div > button:hover {
-  color: #91dfd2 !important;
+  /*color: #91dfd2 !important;*/
 }
 
 /* Tab1 content
@@ -322,8 +323,9 @@ body {
 }
 
 #value-setter-set-btn:hover, #value-setter-view-btn:hover, #value-adder-btn:hover {
-  color: #91dfd2;
-  border-color: white;
+  background-color: #4B5460;
+  color: white;
+  border-color: #4B5460;
 }
 
 #value-setter-panel-usl, #value-setter-panel-lsl, #value-setter-panel-ucl, #value-setter-panel-lcl {
@@ -534,22 +536,22 @@ body {
 #stop-button > div > button {
   color: white !important;
   background-color: #1d202d !important;
-  border: 1px solid #4B5460 !important;
+  border: 1px solid #1d202d !important;
   border-radius: 4px;
   height: 40px;
   line-height: 40px;
 }
 
 #stop-button > div > button:hover {
-  color: #91dfd2 !important;
-  border-color: white !important;
-  background-color: #1d202d !important;
+  color: #1d202d !important;
+  border-color: #1d202d !important;
+  background-color: white !important;
 }
 
 #card-1 P {
   margin: 0 2rem 0 2rem;
   color: inherit;
-  font-weight: bold;
+  /*font-weight: bold;*/
   align-self: flex-start;
 }
 

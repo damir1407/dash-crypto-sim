@@ -7,12 +7,13 @@ import dash_daq as daq
 from dash.exceptions import PreventUpdate
 from dash import ALL, dash_table, html, dcc, MATCH, Output, Input, State
 import numpy as np
+import dash_bootstrap_components as dbc
 
 import pandas as pd
 
 app = dash.Dash(
     __name__,
-    meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}],
+    meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}]
 )
 app.title = "Crypto Trading Dashboard"
 server = app.server
@@ -43,8 +44,8 @@ def build_banner():
             html.Div(
                 id="banner-text",
                 children=[
-                    html.H5("Crypto Trading Dashboard"),
-                    html.H6("Real-time Cryptocurrency Trading and Reporting"),
+                    html.H5("Crypto Simulation Dashboard"),
+                    html.H6("Real-time Cryptocurrency Reporting"),
                 ],
             ),
             html.Div(
@@ -253,7 +254,7 @@ def build_value_setter_line(line_num, value, col3, data_length):
             options=list(
                 {"label": param, "value": param} for param in params[1:]
             ),
-            value=params[1],
+            value=params[data_length],
             className="four columns"
         )
 
@@ -268,6 +269,7 @@ def build_value_setter_line(line_num, value, col3, data_length):
             html.Div(col3, className="four columns"),
         ],
         className="row",
+        style={"margin-bottom": "10px"}
     )
 
 
@@ -337,10 +339,10 @@ def build_quick_stats_panel(initial_portfolio_value, portfolio_value):
             html.Div(
                 id="card-1",
                 children=[
-                    html.P("User ID: 113"),
-                    html.P("Username: damir1407"),
-                    html.P("Full name: Damir Varešanović"),
-                    html.P("Date: 15/08/2022"),
+                    html.P(children=[html.Strong("User ID: "), "113"]),
+                    html.P(children=[html.Strong("Username: "), "damir1407"]),
+                    html.P(children=[html.Strong("Full name: "), "Damir Varešanović"]),
+                    html.P(children=[html.Strong("Date: "), "15/08/2022"]),
                 ],
             ),
             html.Div(
@@ -619,7 +621,7 @@ def generate_graph(interval, specs_dict, portfolio_value, initial_portfolio_valu
     if len(portfolio_value) == 0:
         portfolio_value = [initial_portfolio_value]
 
-    # print(portfolio_value[0])
+    portfolio_value = portfolio_value[-50:]
     x_array = list(range(1, len(portfolio_value)+1))
     y_array = portfolio_value
 
@@ -706,7 +708,7 @@ def generate_graph(interval, specs_dict, portfolio_value, initial_portfolio_valu
                 "y": lcl,
                 "xref": "paper",
                 "yref": "y",
-                "text": "LCL:" + str(round(lcl, 3)),
+                "text": "<b>-2 * STD:" + str(round(lcl, 3)) + "</b>",
                 "showarrow": False,
                 "font": {"color": "051C2C"},
             },
@@ -715,7 +717,7 @@ def generate_graph(interval, specs_dict, portfolio_value, initial_portfolio_valu
                 "y": ucl,
                 "xref": "paper",
                 "yref": "y",
-                "text": "UCL: " + str(round(ucl, 3)),
+                "text": "<b>2 * STD: " + str(round(ucl, 3)) + "</b>",
                 "showarrow": False,
                 "font": {"color": "051C2C"},
             },
@@ -742,7 +744,7 @@ def generate_graph(interval, specs_dict, portfolio_value, initial_portfolio_valu
                 "y": mean,
                 "xref": "paper",
                 "yref": "y",
-                "text": "Targeted mean: " + str(round(mean, 3)),
+                "text": "<b>Mean: " + str(round(mean, 3)) + "</b>",
                 "showarrow": False,
                 "font": {"color": "051C2C"},
             },
@@ -786,7 +788,7 @@ def generate_graph(interval, specs_dict, portfolio_value, initial_portfolio_valu
                 "y0": mean,
                 "x1": len_figure + 1,
                 "y1": mean,
-                "line": {"color": "rgb(255,127,80)", "width": 2},
+                "line": {"color": "rgb(255,127,80)", "width": 1},
             },
             {
                 "type": "line",
