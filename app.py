@@ -221,6 +221,9 @@ def build_tab_1():
                         html.Div(
                             id="portfolio-str", style={"display": "none"}
                         ),
+                        html.Div(
+                            id="value-setter-view-output", className="output-datatable"
+                        ),
                     ],
                 ),
             ],
@@ -1093,7 +1096,8 @@ def update_currency_price(value, _id, state_value, cur_stage, owned_currencies):
 # ====== Callbacks to update stored data via click =====
 @app.callback(
     output=[Output("owned-currencies", "data"),
-            Output("initial-portfolio-value", "data")],
+            Output("initial-portfolio-value", "data"),
+            Output("value-setter-view-output", "children")],
     inputs=[Input("value-setter-set-btn", "n_clicks")],
     state=[
         State({'type': 'metric-select-dropdown', 'index': ALL}, 'value'),
@@ -1106,14 +1110,54 @@ def set_value_setter_store(n_clicks, dd_select, num_input_select, values, owned_
     if n_clicks is None:
         raise PreventUpdate
 
+    new_df_dict = {
+        "Cryptocurrency": [],
+        "Current Amount": [],
+    }
+
     for i, currency in enumerate(dd_select):
-        owned_currencies[dd_select[i]] = {"amount": num_input_select[i], "price": values[i+1]}
+        if num_input_select[i] > 0:
+            owned_currencies[dd_select[i]] = {"amount": num_input_select[i], "price": values[i+1]}
+            new_df_dict["Cryptocurrency"].append(dd_select[i])
+            new_df_dict["Current Amount"].append(num_input_select[i])
 
     new_portfolio_value = 0
     for item in owned_currencies.values():
         new_portfolio_value += item["amount"]
 
-    return owned_currencies, new_portfolio_value
+    if len(owned_currencies) > 0:
+        new_df = pd.DataFrame.from_dict(new_df_dict)
+        data_table = dash_table.DataTable(
+            style_header={"fontWeight": "bold", "color": "inherit"},
+            style_as_list_view=True,
+            fill_width=True,
+            # style_cell_conditional=[
+            #     {"if": {"column_id": "Specs"}, "textAlign": "left"}
+            # ],
+            style_cell={
+                "backgroundColor": "white",
+                "fontFamily": "Open Sans",
+                "padding": "0 2rem",
+                "color": "inherit",
+                "border": "none",
+                "textAlign": "left"
+            },
+            css=[
+                # {"selector": "tr:hover td", "rule": "color: #91dfd2 !important;"},
+                {"selector": "td", "rule": "border: none !important;"},
+                {
+                    "selector": ".dash-cell.focused",
+                    "rule": "background-color: #1e2130 !important;",
+                },
+                {"selector": "table", "rule": "--accent: #1e2130;"},
+                {"selector": "tr", "rule": "background-color: transparent"},
+            ],
+            data=new_df.to_dict("records"),
+            columns=[{"id": c, "name": c} for c in ["Cryptocurrency", "Current Amount"]],
+        )
+
+        return owned_currencies, new_portfolio_value, data_table
+    return owned_currencies, new_portfolio_value, dash.no_update
 
 
 # # ====== Callbacks to update stored data via click =====
