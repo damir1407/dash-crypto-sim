@@ -7,8 +7,6 @@ import dash_daq as daq
 from dash.exceptions import PreventUpdate
 from dash import ALL, dash_table, html, dcc, MATCH, Output, Input, State
 import numpy as np
-import dash_bootstrap_components as dbc
-
 import pandas as pd
 
 app = dash.Dash(
@@ -1112,14 +1110,14 @@ def set_value_setter_store(n_clicks, dd_select, num_input_select, values, owned_
 
     new_df_dict = {
         "Cryptocurrency": [],
-        "Current Amount": [],
+        "Amount": [],
     }
 
     for i, currency in enumerate(dd_select):
         if num_input_select[i] > 0:
             owned_currencies[dd_select[i]] = {"amount": num_input_select[i], "price": values[i+1]}
             new_df_dict["Cryptocurrency"].append(dd_select[i])
-            new_df_dict["Current Amount"].append(num_input_select[i])
+            new_df_dict["Amount"].append(num_input_select[i])
 
     new_portfolio_value = 0
     for item in owned_currencies.values():
@@ -1127,6 +1125,7 @@ def set_value_setter_store(n_clicks, dd_select, num_input_select, values, owned_
 
     if len(owned_currencies) > 0:
         new_df = pd.DataFrame.from_dict(new_df_dict)
+        table_title = html.H5("Current configuration:", style={"padding": "0px 2rem"})
         data_table = dash_table.DataTable(
             style_header={"fontWeight": "bold", "color": "inherit"},
             style_as_list_view=True,
@@ -1153,10 +1152,11 @@ def set_value_setter_store(n_clicks, dd_select, num_input_select, values, owned_
                 {"selector": "tr", "rule": "background-color: transparent"},
             ],
             data=new_df.to_dict("records"),
-            columns=[{"id": c, "name": c} for c in ["Cryptocurrency", "Current Amount"]],
+            columns=[{"id": c, "name": c} for c in ["Cryptocurrency", "Amount"]],
         )
+        new_div = html.Div(children=[table_title, data_table])
 
-        return owned_currencies, new_portfolio_value, data_table
+        return owned_currencies, new_portfolio_value, new_div
     return owned_currencies, new_portfolio_value, dash.no_update
 
 
