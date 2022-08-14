@@ -10,19 +10,19 @@ def handler(event, context):
 
     ws = create_connection("wss://ws-feed.exchange.coinbase.com")
     ws.send(
-        '{"type":"subscribe","product_ids":["ETH-USD", "BTC-USD"],"channels":["ticker",{"name":"ticker","product_ids":["ETH-USD"]}]}'
+        '{"type":"subscribe","product_ids":["ETH-EUR", "BTC-EUR"],"channels":["ticker",{"name":"ticker","product_ids":["BTC-EUR", "ETH-EUR"]}]}'
     )
 
     timeout = 300  # [seconds]
     timeout_start = time.time()
     while time.time() < timeout_start + timeout:
-        time.sleep(1)
         message = ws.recv()
         if json.loads(message)["type"] != "subscriptions":
+            print(message)
             client.put_record(
                 StreamName="dev-coinbase-stream", Data=message, PartitionKey=json.loads(message)["product_id"]
             )
-
+            time.sleep(2)
     ws.close()
     
     return "success"
