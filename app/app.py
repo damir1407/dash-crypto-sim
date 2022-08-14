@@ -8,6 +8,7 @@ from dash.exceptions import PreventUpdate
 from dash import ALL, dash_table, html, dcc, MATCH, Output, Input, State
 import numpy as np
 import pandas as pd
+import boto3
 
 app = dash.Dash(
     __name__,
