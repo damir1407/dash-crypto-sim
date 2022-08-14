@@ -1404,4 +1404,4 @@ def update_piechart(interval, stored_data, owned_currencies, initial_portfolio_v
 
 # Running the server
 if __name__ == "__main__":
-    app.run_server(debug=True, port=8050)
+    app.run_server(host="0.0.0.0", debug=True, port=8050)
