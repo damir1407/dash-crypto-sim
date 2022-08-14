@@ -1,8 +1,7 @@
-# Manufacturing SPC Dashboard
+# Crypto Trading Dashboard
 
 ## Introduction
-`Dash-manufacture-spc-dashboard` is a dashboard for monitoring real-time process quality along manufacture production line. 
-This is a demo of Dash interactive Python framework developed by [Plotly](https//plot.ly/).
+`dash-crypyo-sim` is a dashboard for monitoring real-time cryptocurrency values.
 
 
 ## Built With
