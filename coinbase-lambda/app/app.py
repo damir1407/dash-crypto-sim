@@ -13,7 +13,7 @@ def handler(event, context):
         '{"type":"subscribe","product_ids":["ETH-EUR", "BTC-EUR"],"channels":["ticker",{"name":"ticker","product_ids":["BTC-EUR", "ETH-EUR"]}]}'
     )
 
-    t_end = time.time() + 60 * 1
+    t_end = time.time() + 60 * 14
     while time.time() < t_end:
         message = ws.recv()
         if json.loads(message)["type"] != "subscriptions":
@@ -21,7 +21,6 @@ def handler(event, context):
             client.put_record(
                 StreamName="dev-coinbase-stream", Data=message, PartitionKey=json.loads(message)["product_id"]
             )
-            time.sleep(0.5)
     ws.close()
     
     return "success"
