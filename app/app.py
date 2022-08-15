@@ -19,7 +19,7 @@ server = app.server
 app.config["suppress_callback_exceptions"] = True
 
 APP_PATH = str(pathlib.Path(__file__).parent.resolve())
-df = pd.read_csv(os.path.join(APP_PATH, os.path.join("data", "spc_data.csv")))
+df = pd.read_csv(os.path.join(APP_PATH, os.path.join("data", "final_data.csv")))
 
 params = list(df)
 # print(params)
@@ -100,27 +100,27 @@ def init_df():
     ret = {}
     for col in list(df[1:]):
         data = df[col]
-        stats = data.describe()
-
-        std = stats["std"].tolist()
-        ucl = (stats["mean"] + 3 * stats["std"]).tolist()
-        lcl = (stats["mean"] - 3 * stats["std"]).tolist()
-        usl = (stats["mean"] + stats["std"]).tolist()
-        lsl = (stats["mean"] - stats["std"]).tolist()
+        # stats = data.describe()
+        #
+        # std = stats["std"].tolist()
+        # ucl = (stats["mean"] + 3 * stats["std"]).tolist()
+        # lcl = (stats["mean"] - 3 * stats["std"]).tolist()
+        # usl = (stats["mean"] + stats["std"]).tolist()
+        # lsl = (stats["mean"] - stats["std"]).tolist()
 
         ret.update(
             {
                 col: {
                     "data": data,
-                    "mean": stats["mean"].tolist(),
-                    "std": std,
-                    "ucl": round(ucl, 3),
-                    "lcl": round(lcl, 3),
-                    "usl": round(usl, 3),
-                    "lsl": round(lsl, 3),
-                    "min": stats["min"].tolist(),
-                    "max": stats["max"].tolist(),
-                    "ooc": populate_ooc(data, ucl, lcl),
+                    # "mean": stats["mean"].tolist(),
+                    # "std": std,
+                    # "ucl": round(ucl, 3),
+                    # "lcl": round(lcl, 3),
+                    # "usl": round(usl, 3),
+                    # "lsl": round(lsl, 3),
+                    # "min": stats["min"].tolist(),
+                    # "max": stats["max"].tolist(),
+                    # "ooc": populate_ooc(data, ucl, lcl),
                 }
             }
         )
@@ -470,6 +470,9 @@ def generate_metric_row_helper(stopped_interval, index):
     # ooc_graph_id = item + suffix_ooc_g
     # indicator_id = item + suffix_indicator
 
+    y_array = state_dict[item]["data"][:stopped_interval]
+    y_array = [round(1/float(y), 7) for y in y_array]
+
     return generate_metric_row(
         div_id,
         None,
@@ -502,7 +505,7 @@ def generate_metric_row_helper(stopped_interval, index):
                                 "x": state_dict["Batch"]["data"].tolist()[
                                     :stopped_interval
                                 ],
-                                "y": state_dict[item]["data"][:stopped_interval],
+                                "y": y_array,
                                 "mode": "lines+markers",
                                 "name": item,
                                 "line": {"color": "#051C2C"},
@@ -623,12 +626,12 @@ def generate_graph(interval, specs_dict, portfolio_value, initial_portfolio_valu
     if len(portfolio_value) == 0:
         portfolio_value = [initial_portfolio_value]
 
-    portfolio_value = portfolio_value[-50:]
-    x_array = list(range(1, len(portfolio_value)+1))
-    y_array = portfolio_value
+    new_portfolio_value = portfolio_value[-10:]
+    x_array = list(range(1, len(new_portfolio_value)+1))
+    y_array = new_portfolio_value
 
-    mean = np.mean(y_array)
-    std = np.std(y_array)
+    mean = np.mean(portfolio_value)
+    std = np.std(portfolio_value)
     ucl = mean + 2 * std
     lcl = mean - 2 * std
 
@@ -824,6 +827,7 @@ def generate_graph(interval, specs_dict, portfolio_value, initial_portfolio_valu
 def update_sparkline(interval, param):
     x_array = state_dict["Batch"]["data"].tolist()
     y_array = state_dict[param]["data"].tolist()
+    y_array = [round(1/float(y), 7) for y in y_array]
 
     if interval == 0:
         x_new = y_new = None
@@ -852,8 +856,8 @@ def update_count(interval, col, data):
             total_count = interval - 1
 
         # ooc_percentage_f = data[col]["ooc"][total_count] * 100
-        ooc_percentage_f = data[col]["data"][total_count]
-        ooc_percentage_str = "%.2f" % ooc_percentage_f
+        ooc_percentage_f = float(1 / data[col]["data"][total_count])
+        ooc_percentage_str = "%.7f" % ooc_percentage_f
 
         # # Set maximum ooc to 15 for better grad bar display
         # if ooc_percentage_f > 15:
@@ -992,7 +996,8 @@ def stop_production(n_clicks, current):
             Input("value-setter-view-btn", "n_clicks")],
     state=[State("value-setter-panel", "children"),
            State("value-setter-store", "data"),
-           State("n-interval-stage", "data")],
+           State("interval-component", "n_intervals")]
+           # State("n-interval-stage", "data")]
 )
 def build_value_setter_panel(add_button, remove_button, settings_children, state_value, cur_stage):
     ctx = dash.callback_context
@@ -1005,9 +1010,10 @@ def build_value_setter_panel(add_button, remove_button, settings_children, state
     prop_id = splitted[0]
 
     if prop_id == "value-adder-btn":
+        val = round(1 / state_value[params[1]]["data"][cur_stage], 7)
         line = build_value_setter_line(
             "value-setter-panel-{}".format(len(settings_children)),
-            state_value[params[1]]["data"][cur_stage],
+            val,
             daq.NumericInput(
                 id={
                     'type': 'num-input',
@@ -1035,7 +1041,7 @@ def update_currency_price(value, _id, state_value, cur_stage, owned_currencies):
     amount = 0
     if value in owned_currencies:
         amount = owned_currencies[value]["amount"]
-    return state_value[value]["data"][cur_stage], amount
+    return round(1 / state_value[value]["data"][cur_stage], 7), amount
 
 
 # ===== Callbacks to update values based on store data and dropdown selection =====
@@ -1292,7 +1298,7 @@ def update_portfolio_value(interval, data, owned_currencies, portfolio_value, di
 
     new_portfolio_value = 0
     for item in owned_currencies:
-        new_portfolio_value += (owned_currencies[item]["amount"] * data[item]["data"][interval]) / owned_currencies[item]["price"]
+        new_portfolio_value += (owned_currencies[item]["amount"] * (1 / data[item]["data"][interval])) / owned_currencies[item]["price"]
 
     portfolio_value.append(new_portfolio_value)
 
