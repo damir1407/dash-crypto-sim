@@ -200,7 +200,7 @@ def build_tab_1():
                                     build_value_setter_line(
                                         "value-setter-panel-header",
                                         "Current Value",
-                                        "Set amount in €",
+                                        "Set amount in $",
                                         0
                                     )
                                 ]),
@@ -327,12 +327,12 @@ def generate_modal():
 
 
 def build_quick_stats_panel(initial_portfolio_value, portfolio_value):
-    initial_portfolio_value_str = str(initial_portfolio_value) + "€"
+    initial_portfolio_value_str = str(initial_portfolio_value) + "$"
 
     if len(portfolio_value) == 0:
         portfolio_value_str = "--"
     else:
-        portfolio_value_str = str(portfolio_value[-1]) + "€"
+        portfolio_value_str = str(portfolio_value[-1]) + "$"
 
     return html.Div(
         id="quick-stats",
@@ -642,7 +642,7 @@ def generate_graph(interval, specs_dict, portfolio_value, initial_portfolio_valu
     ooc_trace = {
         "x": [],
         "y": [],
-        "name": "Out of Control",
+        "name": "High Deviation",
         "mode": "markers",
         "marker": dict(color="rgba(210, 77, 87, 0.7)", symbol="square", size=11),
     }
@@ -1296,7 +1296,7 @@ def update_portfolio_value(interval, data, owned_currencies, portfolio_value, di
 
     portfolio_value.append(new_portfolio_value)
 
-    return portfolio_value, str(round(new_portfolio_value, 2)) + "€"
+    return portfolio_value, str(round(new_portfolio_value, 2)) + "$"
 
 
 #  ======= button to choose/update figure based on click ============

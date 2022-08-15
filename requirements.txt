@@ -1,3 +1,4 @@
+boto3
 dash
 dash-daq==0.1.7
 gunicorn>=19.9.0
