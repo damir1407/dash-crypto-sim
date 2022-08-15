@@ -471,7 +471,7 @@ def generate_metric_row_helper(stopped_interval, index):
     # indicator_id = item + suffix_indicator
 
     y_array = state_dict[item]["data"][:stopped_interval]
-    y_array = [round(1/float(y), 7) for y in y_array]
+    y_array = [1/float(y) for y in y_array]
 
     return generate_metric_row(
         div_id,
@@ -827,7 +827,7 @@ def generate_graph(interval, specs_dict, portfolio_value, initial_portfolio_valu
 def update_sparkline(interval, param):
     x_array = state_dict["Batch"]["data"].tolist()
     y_array = state_dict[param]["data"].tolist()
-    y_array = [round(1/float(y), 7) for y in y_array]
+    y_array = [1/float(y) for y in y_array]
 
     if interval == 0:
         x_new = y_new = None
@@ -857,7 +857,7 @@ def update_count(interval, col, data):
 
         # ooc_percentage_f = data[col]["ooc"][total_count] * 100
         ooc_percentage_f = float(1 / data[col]["data"][total_count])
-        ooc_percentage_str = "%.7f" % ooc_percentage_f
+        ooc_percentage_str = "%.9f" % ooc_percentage_f
 
         # # Set maximum ooc to 15 for better grad bar display
         # if ooc_percentage_f > 15:
@@ -1010,7 +1010,7 @@ def build_value_setter_panel(add_button, remove_button, settings_children, state
     prop_id = splitted[0]
 
     if prop_id == "value-adder-btn":
-        val = round(1 / state_value[params[1]]["data"][cur_stage], 7)
+        val = round(1 / state_value[params[1]]["data"][cur_stage], 9)
         line = build_value_setter_line(
             "value-setter-panel-{}".format(len(settings_children)),
             val,
@@ -1041,7 +1041,7 @@ def update_currency_price(value, _id, state_value, cur_stage, owned_currencies):
     amount = 0
     if value in owned_currencies:
         amount = owned_currencies[value]["amount"]
-    return round(1 / state_value[value]["data"][cur_stage], 7), amount
+    return round(1 / state_value[value]["data"][cur_stage], 9), amount
 
 
 # ===== Callbacks to update values based on store data and dropdown selection =====
@@ -1117,14 +1117,14 @@ def set_value_setter_store(n_clicks, dd_select, num_input_select, values, owned_
 
     new_df_dict = {
         "Cryptocurrency": [],
-        "Amount": [],
+        "Amount in $": [],
     }
 
     for i, currency in enumerate(dd_select):
         if num_input_select[i] > 0:
             owned_currencies[dd_select[i]] = {"amount": num_input_select[i], "price": values[i+1]}
             new_df_dict["Cryptocurrency"].append(dd_select[i])
-            new_df_dict["Amount"].append(num_input_select[i])
+            new_df_dict["Amount in $"].append(num_input_select[i])
 
     new_portfolio_value = 0
     for item in owned_currencies.values():
@@ -1159,7 +1159,7 @@ def set_value_setter_store(n_clicks, dd_select, num_input_select, values, owned_
                 {"selector": "tr", "rule": "background-color: transparent"},
             ],
             data=new_df.to_dict("records"),
-            columns=[{"id": c, "name": c} for c in ["Cryptocurrency", "Amount"]],
+            columns=[{"id": c, "name": c} for c in ["Cryptocurrency", "Amount in $"]],
         )
         new_div = html.Div(children=[table_title, data_table])
 
